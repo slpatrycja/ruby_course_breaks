@@ -1,0 +1,45 @@
+--- !ruby/object:User
+card_number: DTZ83195
+name: janusz
+user_books:
+- encyklopedia
+- życie w madrycie
+- jaś i małgosia
+history_of_checkouts:
+- :title: encyklopedia
+  :date: 2018-07-14 17:01:24.608306664 +02:00
+- :title: życie w madrycie
+  :date: 2018-07-14 18:32:38.147757177 +02:00
+- :title: jaś i małgosia
+  :date: 2018-07-14 18:42:22.933352928 +02:00
+
+--- !ruby/object:User
+card_number: KHA25188
+name: anna malcharek
+user_books: []
+history_of_checkouts: []
+
+--- !ruby/object:User
+card_number: YNB13366
+name: kasia hudaszek
+user_books: []
+history_of_checkouts: []
+
+--- !ruby/object:User
+card_number: CYB91920
+name: jan kowalski
+user_books:
+- pojedynek na słowa
+history_of_checkouts:
+- :title: pojedynek na słowa
+  :date: 2018-07-14 18:45:54.344765892 +02:00
+
+--- !ruby/object:User
+card_number: XDB85917
+name: klaudia świerk
+user_books:
+- alicja w krainie czarów
+history_of_checkouts:
+- :title: alicja w krainie czarów
+  :date: 2018-07-14 18:46:45.427734040 +02:00
+
