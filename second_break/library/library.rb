@@ -128,25 +128,34 @@ def programme
 	
 	library = Library.new
 	puts "Welcome to our new library!"
-	puts "Tell us what you want to do:"
+	menu(library)
+
+end
+
+def menu(library)
+	
+	puts "Menu:"
 	puts "1. Show the list of our books", "2. Give us a book", "3. Add yourself to readers register and create your own librarian card"
 	puts "4. Log in", "5. Exit"
 
 	case gets.to_i
-		when 1 then library.show_books
+		when 1 
+			library.show_books
+			exit_or_return(library)
 		when 2	
 			puts "Please enter the title of the book you want to give"
 			title = gets.chomp.downcase
 			library.add_book(title)
 			library.show_books
 			puts "Thank you for your donation"
-			puts "Exiting..."
+			exit_or_return(library)
 		when 3
 			puts "Please type your name and lastname"
 			name = gets.chomp.downcase
 			new_user = User.new(name)
 			library.add_user(new_user)
 			puts "Thanks for joining us!"
+			exit_or_return(library)
 			
 		when 4
 			
@@ -154,7 +163,15 @@ def programme
 			card_number = gets.chomp
 			user = library.log_in(card_number)
 			puts "Logged now as #{user.name.capitalize}"
-			puts "What do you want to do?"
+			user_menu(library, user)
+			
+		when 5
+			exit
+	end
+end
+
+def user_menu(library, user)
+	puts "What do you want to do?"
 			puts "1. Check out the book", "2. Return the book", "3. Show history of checkouts"
 				case gets.to_i
 				when 1
@@ -167,22 +184,38 @@ def programme
 					
 					else puts "This book is unavaible"
 					end
-					
+					user_exit_or_return(library, user)
 				when 2
 					puts "Please enter the title of the book you want to return"
 					title = gets.chomp.downcase
 					user.return_book(title, library)
 					puts "Here's the fresh list of books that you've checked out"
 					puts user.user_books
+					user_exit_or_return(library, user)
 
 				when 3
 					puts "Your history:"
 					user.history_of_checkouts.each { |book| puts "Title: #{book[:title]}, date: #{book[:date]}" }
-					
+					user_exit_or_return(library, user)
 				end
-		when 5
-			exit
+end
+
+def exit_or_return(library)
+	puts "Press 1 to quit or 2 to go back to menu"
+	case gets.to_i
+		when 1 then exit
+		when 2 then menu(library)
 	end
 end
+
+def user_exit_or_return(library, user)
+	puts "Press 1 to quit or 2 to go back to user panel"
+	case gets.to_i
+		when 1 then exit
+		when 2 then user_menu(library, user)
+	end
+end
+
+
 
 programme
