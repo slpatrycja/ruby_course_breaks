@@ -1,5 +1,25 @@
 require "yaml"
 
+class Store
+	def initialize(dir, mode)
+		@dir = dir
+		@m = mode
+		File.delete(@dir)
+		@f = File.open(@dir, @m)
+	end
+
+	def save_users(users_base)
+		users_base.each do |user|
+	    	@f.puts YAML::dump(user)
+	    	@f.puts ""
+    	end
+	end
+
+	def save_books(books)
+  		@f.write books
+	end
+end
+
 class Library
 	include Enumerable
 	attr_reader :books, :users_base
@@ -11,7 +31,7 @@ class Library
 		$/="\n\n"
 		File.open("users.txt", "r").each { |object| @users_base << YAML::load(object) }
 
-  		if File.read("books.txt").empty?
+  		if File.read('books.txt').empty?
   			@books = []
   		else
 			@books = Kernel.eval(File.read("books.txt"))
@@ -21,16 +41,12 @@ class Library
 
 	def add_book(book_title) 
 		@books.push({:title => book_title, :status => 'avaible'})
-		update_books_file
+		Store.new('books.txt', 'a').save_books(@books)
 	end
 
 	def add_user(user)
 		@users_base.push(user)
-		users_file = File.open("users.txt", "w")
-		@users_base.each do |user|
-	    	users_file.puts YAML::dump(user)
-	    	users_file.puts ""
-    	end
+		Store.new('users.txt','w').save_users(@users_base)
   	end
  
 	def show_books
@@ -62,7 +78,7 @@ class Library
 			to_check_out[:status] = 'unavaible'
 			@books.push(to_check_out)
 
-			update_books_file
+			Store.new('books.txt', 'a').save_books(@books)
 	  		1
   		end
 	end
@@ -74,14 +90,9 @@ class Library
 		to_return[:status] = 'avaible'
 		@books.push(to_return)
 
-		update_books_file
+		Store.new('books.txt', 'a').save_books(@books)
 	end
 
-	def update_books_file
-		File.delete('books.txt')
-		books_file = open('books.txt', 'a') 
-  		books_file.write @books
-	end
 
 end
 
