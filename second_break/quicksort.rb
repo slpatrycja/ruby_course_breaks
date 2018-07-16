@@ -1,16 +1,16 @@
 def quicksort(array, left, right)
 
-i = j = left
+	i = j = left
 
-while i < right
-	if array[i] < array[right]
-		array[i], array[j] = array[j], array[i]
-		j+=1
+	while i < right
+		if array[i] < array[right]
+			array[i], array[j] = array[j], array[i]
+			j+=1
+		end
+		i+=1
 	end
-	i+=1
-end
 
-array[j], array[right] = array[right], array[j]
+	array[j], array[right] = array[right], array[j]
 
 	if left < j-1
 		quicksort(array, left, j-1)
@@ -20,7 +20,7 @@ array[j], array[right] = array[right], array[j]
 		quicksort(array,j+1,right)
 	end
 
-	return array
+	array
 end
 
 to_sort = ARGV.map(&:to_i)
