@@ -20,12 +20,6 @@ user_books: []
 history_of_checkouts: []
 
 --- !ruby/object:User
-card_number: YNB13366
-name: kasia hudaszek
-user_books: []
-history_of_checkouts: []
-
---- !ruby/object:User
 card_number: CYB91920
 name: jan kowalski
 user_books:
@@ -48,4 +42,15 @@ card_number: AZM81598
 name: pszemo wilku
 user_books: []
 history_of_checkouts: []
+
+--- !ruby/object:User
+card_number: YNB13366
+name: kasia hudaszek
+user_books:
+- momo
+- popo
+history_of_checkouts:
+- :title: popo
+  :date: 2018-07-16, 13:56:07
+  :return_date: 2018-07-30, 13:56:07
 

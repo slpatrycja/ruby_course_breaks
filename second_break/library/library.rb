@@ -110,7 +110,8 @@ class User
 		if library.check_out(title) == 1
 
 			@user_books.push(title)
-			@history_of_checkouts.push({ :title => title, :date => Time.now})
+			@history_of_checkouts.push({ :title => title, :date => Time.now.strftime("%Y-%m-%d, %T"), 
+				:return_date => (Time.now + (2*7*24*60*60)).strftime("%Y-%m-%d, %T")})
 
 			library.users_base.delete(self)
 			library.add_user(self)
@@ -206,10 +207,14 @@ def user_menu(library, user)
 
 			when 3
 				puts "Your history:"
-				user.history_of_checkouts.each { |book| puts "Title: #{book[:title]}, date: #{book[:date]}" }
+				user.history_of_checkouts.each do |book| 
+					days_left = book[:return_date].chars[8..9].join.to_i - book[:date].chars[8..9].join.to_i
+					print "Title: #{book[:title]}"
+					print " date: #{book[:date]}, valid to: #{book[:return_date]}"
+					print "(days left: #{days_left})\n"
+				end
 				exit_or_return_to_user_menu(library, user)
-			
-
+		
 		    when 4
 		    	user = nil
 		    	menu(library)
