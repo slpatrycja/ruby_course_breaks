@@ -43,3 +43,9 @@ history_of_checkouts:
 - :title: alicja w krainie czarów
   :date: 2018-07-14 18:46:45.427734040 +02:00
 
+--- !ruby/object:User
+card_number: AZM81598
+name: pszemo wilku
+user_books: []
+history_of_checkouts: []
+
