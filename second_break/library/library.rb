@@ -16,7 +16,10 @@ class Store
 	end
 
 	def save_books(books)
-  		@f.write books
+  		books.each do |book|
+	    	@f.puts YAML::dump(book)
+	    	@f.puts ""
+    	end
 	end
 end
 
@@ -30,17 +33,12 @@ class Library
 
 		$/="\n\n"
 		File.open("users.txt", "r").each { |object| @users_base << YAML::load(object) }
-
-  		if File.read('books.txt').empty?
-  			@books = []
-  		else
-			@books = Kernel.eval(File.read("books.txt"))
-		end
+		File.open("books.txt", "r").each { |object| @books << YAML::load(object) }
 
 	end
 
-	def add_book(book_title) 
-		@books.push({:title => book_title, :status => 'avaible'})
+	def add_book(title) 
+		@books.push(Book.new(title))
 		Store.new('books.txt', 'a').save_books(@books)
 	end
 
@@ -51,7 +49,7 @@ class Library
  
 	def show_books
 		@books.each do |book| 
-			print "Tytuł: #{book[:title].capitalize}, dostępność: #{book[:status]}\n"
+			print "Tytuł: #{book.title.capitalize}, dostępność: #{book.status}\n"
 		end
 	end
 
@@ -66,34 +64,37 @@ class Library
 	end
 
 	def check_out(title)
-		book_index = @books.index { |book| book[:title] == title && book[:status] == 'avaible'}
+		to_check_out = @books.detect { |book| book.title == title && book.status == 'avaible'}
 
-		if book_index == nil 
+		if to_check_out == nil 
 			"This book is unavaible"
 			0
 		else
-			to_check_out = @books[book_index]
-
-			@books.delete_at(book_index)
-			to_check_out[:status] = 'unavaible'
-			@books.push(to_check_out)
-
+			to_check_out.status = 'unavaible'
 			Store.new('books.txt', 'a').save_books(@books)
 	  		1
   		end
 	end
 
 	def return_book(title)
-		to_return = @books.detect { |book| book[:title] == title }
+		to_return = @books.detect { |book| book.title == title && book.status == 'unavaible'}
 
-		@books.delete(to_return)
-		to_return[:status] = 'avaible'
-		@books.push(to_return)
-
+		to_return.status = 'avaible'
 		Store.new('books.txt', 'a').save_books(@books)
 	end
 
 
+end
+
+class Book
+
+	attr_reader :title
+	attr_accessor :status
+
+	def initialize(title)
+		@title = title
+		@status = 'avaible'
+	end
 end
 
 class User
@@ -146,48 +147,59 @@ def programme
 	
 	library = Library.new
 	puts "Welcome to our new library!"
-	menu(library)
+	menu = Menu.new(library)
+	menu.show_options
 
 end
 
-def menu(library)
+class Menu
 	
-	puts "Menu:"
-	puts "1. Show the list of our books", "2. Give us a book"
-	puts "3. Add yourself to readers register and create your own librarian card"
-	puts "4. Log in", "5. Exit"
-
-	case gets.to_i
-		when 1 
-			library.show_books
-			exit_or_return_to_menu(library)
-		when 2	
-			puts "Please enter the title of the book you want to give"
-			title = gets.chomp.downcase
-			library.add_book(title)
-			library.show_books
-			puts "Thank you for your donation"
-			exit_or_return_to_menu(library)
-		when 3
-			puts "Please type your name and lastname"
-			name = gets.chomp.downcase
-			new_user = User.new(name)
-			library.add_user(new_user)
-			puts "Thanks for joining us!"
-			exit_or_return_to_menu(library)
-			
-		when 4
-			
-			puts "Please enter your card number for verifiation"
-			card_number = gets.chomp
-			user = library.log_in(card_number)
-			puts "Logged now as #{user.name.capitalize}"
-			user_menu(library, user)
-			
-		when 5
-			exit
+	def initialize(library)
+		@library = library
 	end
-end
+
+	def show_options
+		puts "Menu:"
+		puts "1. Show the list of our books", "2. Give us a book"
+		puts "3. Add yourself to readers register and create your own librarian card"
+		puts "4. Log in", "5. Exit"
+
+		@choice = gets.to_i
+		action
+	end
+
+	def action
+		case @choice
+			when 1 
+				@library.show_books
+				exit_or_return_to_menu(@library)
+			when 2	
+				puts "Please enter the title of the book you want to give"
+				title = gets.chomp.downcase
+				@library.add_book(title)
+				@library.show_books
+				puts "Thank you for your donation"
+				exit_or_return_to_menu(@library)
+			when 3
+				puts "Please type your name and lastname"
+				name = gets.chomp.downcase
+				new_user = User.new(name)
+				@library.add_user(new_user)
+				puts "Thanks for joining us!"
+				exit_or_return_to_menu(@library)
+				
+			when 4
+				
+				puts "Please enter your card number for verifiation"
+				card_number = gets.chomp
+				user = @library.log_in(card_number)
+				puts "Logged now as #{user.name.capitalize}"
+				user_menu(@library, user)
+				
+			when 5
+				exit
+		end
+	end
 
 def user_menu(library, user)
 	puts "What do you want to do?"
@@ -200,12 +212,12 @@ def user_menu(library, user)
 
 				if result == 1
 					puts "Here's the fresh list of books that you've checked out"
-					puts user.user_books
-					
-				else puts "This book is unavaible"
+					puts user.user_books	
+				else 
+					puts "This book is unavaible"
 				end
-
 				exit_or_return_to_user_menu(library, user)
+
 			when 2
 				puts "Please enter the title of the book you want to return"
 				title = gets.chomp.downcase
@@ -228,26 +240,27 @@ def user_menu(library, user)
 		
 		    when 4
 		    	user = nil
-		    	menu(library)
+		    	show_options
 		end
-end
-
-def exit_or_return_to_menu(library)
-	puts "Press 1 to quit or 2 to go back to menu"
-	case gets.to_i
-		when 1 then exit
-		when 2 then menu(library)
 	end
-end
 
-def exit_or_return_to_user_menu(library, user)
-	puts "Press 1 to quit or 2 to go back to user panel"
-	case gets.to_i
-		when 1 then exit
-		when 2 then user_menu(library, user)
+
+	def exit_or_return_to_menu(library)
+		puts "Press 1 to quit or 2 to go back to menu"
+		case gets.to_i
+			when 1 then exit
+			when 2 then show_options
+		end
 	end
+
+	def exit_or_return_to_user_menu(library, user)
+		puts "Press 1 to quit or 2 to go back to user panel"
+		case gets.to_i
+			when 1 then exit
+			when 2 then user_menu(library, user)
+		end
+	end
+
 end
-
-
 
 programme

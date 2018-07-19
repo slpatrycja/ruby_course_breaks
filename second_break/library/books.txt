@@ -1,1 +1,12 @@
-[{:title=>"aaa", :status=>"avaible"}, {:title=>"bbb", :status=>"avaible"}, {:title=>"ccc", :status=>"avaible"}]
+--- !ruby/object:Book
+title: ania z zielonego wzgórza
+status: avaible
+
+--- !ruby/object:Book
+title: momo
+status: unavaible
+
+--- !ruby/object:Book
+title: shrek
+status: unavaible
+

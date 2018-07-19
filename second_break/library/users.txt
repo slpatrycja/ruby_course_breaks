@@ -1,10 +1,4 @@
 --- !ruby/object:User
-card_number: IHF77496
-name: piotr
-user_books: []
-history_of_checkouts: []
-
---- !ruby/object:User
 card_number: NUK27122
 name: kuba kowalski
 user_books: []
@@ -15,4 +9,18 @@ card_number: OFT32644
 name: anna nowak
 user_books: []
 history_of_checkouts: []
+
+--- !ruby/object:User
+card_number: IHF77496
+name: piotr
+user_books:
+- momo
+- shrek
+history_of_checkouts:
+- :title: momo
+  :date: 2018-07-19, 14:11:17
+  :return_date: 2018-08-02, 14:11:17
+- :title: shrek
+  :date: 2018-07-19, 14:14:10
+  :return_date: 2018-08-02, 14:14:10
 
