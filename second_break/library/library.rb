@@ -3,22 +3,19 @@ require "yaml"
 class Store
 	def initialize(dir, mode)
 		@dir = dir
-		@m = mode
+		@mode = mode	
+	end
+
+	def load_to(this_base)
+		File.open(@dir, @mode).each { |object| this_base << YAML::load(object) }
+	end
+
+	def save_from(this_base)
 		File.delete(@dir)
-		@f = File.open(@dir, @m)
-	end
-
-	def save_users(users_base)
-		users_base.each do |user|
-	    	@f.puts YAML::dump(user)
-	    	@f.puts ""
-    	end
-	end
-
-	def save_books(books)
-  		books.each do |book|
-	    	@f.puts YAML::dump(book)
-	    	@f.puts ""
+		@file = File.open(@dir, @mode)
+		this_base.each do |e|
+	    	@file.puts YAML::dump(e)
+	    	@file.puts ""
     	end
 	end
 end
@@ -28,27 +25,26 @@ class Library
 	attr_reader :books, :users_base
 
 	def initialize
-		@books = []
+		@books_base = []
 		@users_base = []
 
 		$/="\n\n"
-		File.open("users.txt", "r").each { |object| @users_base << YAML::load(object) }
-		File.open("books.txt", "r").each { |object| @books << YAML::load(object) }
-
+		Store.new("users.txt", "r").load_to(@users_base)
+		Store.new("books.txt", "r").load_to(@books_base)
 	end
 
 	def add_book(title) 
-		@books.push(Book.new(title))
-		Store.new('books.txt', 'a').save_books(@books)
+		@books_base.push(Book.new(title))
+		Store.new('books.txt', 'a').save_from(@books_base)
 	end
 
 	def add_user(user)
 		@users_base.push(user)
-		Store.new('users.txt','w').save_users(@users_base)
+		Store.new('users.txt','w').save_from(@users_base)
   	end
  
 	def show_books
-		@books.each do |book| 
+		@books_base.each do |book| 
 			print "Tytuł: #{book.title.capitalize}, dostępność: #{book.status}\n"
 		end
 	end
@@ -64,26 +60,22 @@ class Library
 	end
 
 	def check_out(title)
-		to_check_out = @books.detect { |book| book.title == title && book.status == 'avaible'}
+		to_check_out = @books_base.detect { |book| book.title == title && book.status == 'avaible'}
 
 		if to_check_out == nil 
-			"This book is unavaible"
-			0
+			return 0
 		else
 			to_check_out.status = 'unavaible'
-			Store.new('books.txt', 'a').save_books(@books)
-	  		1
+			Store.new('books.txt', 'a').save_from(@books_base)
+	  		return 1
   		end
 	end
 
 	def return_book(title)
-		to_return = @books.detect { |book| book.title == title && book.status == 'unavaible'}
-
+		to_return = @books_base.detect { |book| book.title == title && book.status == 'unavaible'}
 		to_return.status = 'avaible'
-		Store.new('books.txt', 'a').save_books(@books)
+		Store.new('books.txt', 'a').save_from(@books_base)
 	end
-
-
 end
 
 class Book
@@ -143,14 +135,6 @@ class User
 
 end
 
-def programme
-	
-	library = Library.new
-	puts "Welcome to our new library!"
-	menu = Menu.new(library)
-	menu.show_options
-
-end
 
 class Menu
 	
@@ -201,47 +185,47 @@ class Menu
 		end
 	end
 
-def user_menu(library, user)
-	puts "What do you want to do?"
-	puts "1. Check out the book", "2. Return the book", "3. Show history of checkouts", "4. Log out"
-		case gets.to_i
-			when 1
-				puts "Please enter the title of the book you want to check out"
-				title = gets.chomp.downcase
-				result = user.check_out(title, library)
+	def user_menu(library, user)
+		puts "What do you want to do?"
+		puts "1. Check out the book", "2. Return the book", "3. Show history of checkouts", "4. Log out"
+			case gets.to_i
+				when 1
+					puts "Please enter the title of the book you want to check out"
+					title = gets.chomp.downcase
+					result = user.check_out(title, library)
 
-				if result == 1
+					if result == 1
+						puts "Here's the fresh list of books that you've checked out"
+						puts user.user_books	
+					else 
+						puts "This book is unavaible"
+					end
+					exit_or_return_to_user_menu(library, user)
+
+				when 2
+					puts "Please enter the title of the book you want to return"
+					title = gets.chomp.downcase
+					user.return_book(title, library)
+
 					puts "Here's the fresh list of books that you've checked out"
-					puts user.user_books	
-				else 
-					puts "This book is unavaible"
-				end
-				exit_or_return_to_user_menu(library, user)
+					puts user.user_books
 
-			when 2
-				puts "Please enter the title of the book you want to return"
-				title = gets.chomp.downcase
-				user.return_book(title, library)
+					exit_or_return_to_user_menu(library, user)
 
-				puts "Here's the fresh list of books that you've checked out"
-				puts user.user_books
-
-				exit_or_return_to_user_menu(library, user)
-
-			when 3
-				puts "Your history:"
-				user.history_of_checkouts.each do |book| 
-					days_left = book[:return_date].chars[8..9].join.to_i - book[:date].chars[8..9].join.to_i
-					print "Title: #{book[:title]}"
-					print " date: #{book[:date]}, valid to: #{book[:return_date]}"
-					print "(days left: #{days_left})\n"
-				end
-				exit_or_return_to_user_menu(library, user)
-		
-		    when 4
-		    	user = nil
-		    	show_options
-		end
+				when 3
+					puts "Your history:"
+					user.history_of_checkouts.each do |book| 
+						days_left = book[:return_date].chars[8..9].join.to_i - book[:date].chars[8..9].join.to_i
+						print "Title: #{book[:title]}"
+						print " date: #{book[:date]}, valid to: #{book[:return_date]}"
+						print "(days left: #{days_left})\n"
+					end
+					exit_or_return_to_user_menu(library, user)
+			
+			    when 4
+			    	user = nil
+			    	show_options
+			end
 	end
 
 
@@ -263,4 +247,12 @@ def user_menu(library, user)
 
 end
 
+def programme
+	
+	library = Library.new
+	puts "Welcome to our new library!"
+	menu = Menu.new(library)
+	menu.show_options
+
+end
 programme

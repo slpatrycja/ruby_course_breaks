@@ -24,3 +24,15 @@ history_of_checkouts:
   :date: 2018-07-19, 14:14:10
   :return_date: 2018-08-02, 14:14:10
 
+--- !ruby/object:User
+card_number: CMW12618
+name: jakub kowalski
+user_books: []
+history_of_checkouts: []
+
+--- !ruby/object:User
+card_number: VGD69056
+name: jadwiga nowak
+user_books: []
+history_of_checkouts: []
+

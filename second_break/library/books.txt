@@ -10,3 +10,11 @@ status: unavaible
 title: shrek
 status: unavaible
 
+--- !ruby/object:Book
+title: zielony maj
+status: avaible
+
+--- !ruby/object:Book
+title: koniczynka
+status: avaible
+
