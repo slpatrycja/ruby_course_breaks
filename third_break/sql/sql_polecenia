@@ -1,0 +1,233 @@
+ad. 1
+# SELECT name FROM Products;
+      name       
+-----------------
+ Hard drive
+ Memory
+ ZIP drive
+ Floppy disk
+ Monitor
+ DVD drive
+ CD drive
+ Printer
+ Toner cartridge
+ DVD burner
+
+ad.2
+# SELECT name, price FROM Products;
+      name       | price 
+-----------------+-------
+ Hard drive      |   240
+ Memory          |   120
+ ZIP drive       |   150
+ Floppy disk     |     5
+ Monitor         |   240
+ DVD drive       |   180
+ CD drive        |    90
+ Printer         |   270
+ Toner cartridge |    66
+ DVD burner      |   180
+
+AD.3
+
+# SELECT name FROM Products
+# WHERE price <= 200;
+      name       
+-----------------
+ Memory
+ ZIP drive
+ Floppy disk
+ DVD drive
+ CD drive
+ Toner cartridge
+ DVD burner
+
+ad.4 
+
+SELECT * FROM Products
+WHERE price > 60 AND price < 120;
+ code |      name       | price | manufacturer_code 
+------+-----------------+-------+-------------------
+    7 | CD drive        |    90 |                 2
+    9 | Toner cartridge |    66 |                 3
+
+
+ad.5
+
+# SELECT name, price*100 FROM Products;
+      name       | ?column? 
+-----------------+----------
+ Hard drive      |    24000
+ Memory          |    12000
+ ZIP drive       |    15000
+ Floppy disk     |      500
+ Monitor         |    24000
+ DVD drive       |    18000
+ CD drive        |     9000
+ Printer         |    27000
+ Toner cartridge |     6600
+ DVD burner      |    18000
+
+ad.6
+
+SELECT AVG(price) FROM Products;
+  avg  
+-------
+ 154.1
+
+ad.7
+
+SELECT AVG(price) FROM Products
+WHERE manufacturer_code = 2;
+ avg 
+-----
+ 150
+
+ad.8
+
+SELECT COUNT(name) FROM Products
+WHERE price >= 180;
+ count 
+-------
+     5
+
+ad.9
+
+SELECT name, price FROM Products
+WHERE price >= 180
+ORDER BY price DESC, name;
+    name    | price 
+------------+-------
+ Printer    |   270
+ Hard drive |   240
+ Monitor    |   240
+ DVD burner |   180
+ DVD drive  |   180
+
+ad.10
+
+SELECT * FROM Products
+JOIN Manufacturers ON Products.manufacturer_code = Manufacturers.code;
+ code |      name       | price | manufacturer_code | code |      name       
+------+-----------------+-------+-------------------+------+-----------------
+    1 | Hard drive      |   240 |                 5 |    5 | Fujitsu
+    2 | Memory          |   120 |                 6 |    6 | Winchester
+    3 | ZIP drive       |   150 |                 4 |    4 | Iomega
+    4 | Floppy disk     |     5 |                 6 |    6 | Winchester
+    5 | Monitor         |   240 |                 1 |    1 | Sony
+    6 | DVD drive       |   180 |                 2 |    2 | Creative Labs
+    7 | CD drive        |    90 |                 2 |    2 | Creative Labs
+    8 | Printer         |   270 |                 3 |    3 | Hewlett-Packard
+    9 | Toner cartridge |    66 |                 3 |    3 | Hewlett-Packard
+   10 | DVD burner      |   180 |                 2 |    2 | Creative Labs
+
+ad.11
+
+SELECT Products.name, price, Manufacturers.name FROM Products
+JOIN Manufacturers ON Products.manufacturer_code = Manufacturers.code;
+
+      name       | price |      name       
+-----------------+-------+-----------------
+ Hard drive      |   240 | Fujitsu
+ Memory          |   120 | Winchester
+ ZIP drive       |   150 | Iomega
+ Floppy disk     |     5 | Winchester
+ Monitor         |   240 | Sony
+ DVD drive       |   180 | Creative Labs
+ CD drive        |    90 | Creative Labs
+ Printer         |   270 | Hewlett-Packard
+ Toner cartridge |    66 | Hewlett-Packard
+ DVD burner      |   180 | Creative Labs
+
+ad.12
+SELECT AVG(price) AS as avg_price, manufacturer_code
+FROM Products
+GROUP BY manufacturer_code;
+
+ avg_price | manufacturer_code 
+-----------+-------------------
+       150 |                 4
+       240 |                 1
+       240 |                 5
+       168 |                 3
+      62.5 |                 6
+       150 |                 2
+
+ad.13
+
+SELECT AVG(price) as avg_price, Manufacturers.name
+FROM Products
+JOIN Manufacturers ON Manufacturers.code = manufacturer_code
+GROUP BY Manufacturers.name;
+
+avg_price |      name       
+-----------+-----------------
+       168 | Hewlett-Packard
+       150 | Iomega
+      62.5 | Winchester
+       240 | Fujitsu
+       240 | Sony
+       150 | Creative Labs
+
+
+ad. 14
+
+SELECT Manufacturers.name
+FROM Products
+JOIN Manufacturers ON Manufacturers.code = manufacturer_code
+GROUP BY Manufacturers.name
+HAVING AVG(price) >= 150;
+
+name       
+-----------------
+ Hewlett-Packard
+ Iomega
+ Fujitsu
+ Sony
+ Creative Labs
+
+ad.15
+
+SELECT name, price
+FROM Products
+WHERE price = 
+(SELECT MIN(price) FROM Products);
+    name     | price 
+-------------+-------
+ Floppy disk |     5
+
+
+ad.16
+
+SELECT Manufacturers.name, MAX(price) as maxprice
+from Products
+JOIN Manufacturers ON Manufacturers.code = manufacturer_code
+GROUP BY Manufacturers.name;
+
+name       | maxprice 
+-----------------+----------
+ Hewlett-Packard |      270
+ Iomega          |      150
+ Winchester      |      120
+ Fujitsu         |      240
+ Sony            |      240
+ Creative Labs   |      180
+
+ad.17
+
+INSERT INTO Products(Name, Price, Manufacturer_code) VALUES('Loudspeakers', 70, 2);
+ 
+ad.18
+ UPDATE Products
+SET name = 'Laser Printer'
+WHERE code = 8;
+
+ad.19
+UPDATE Products
+SET price = price*0.9;
+
+ad.20
+
+UPDATE Products
+SET price = price*0.9
+WHERE price > 120;
